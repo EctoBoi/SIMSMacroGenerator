@@ -257,8 +257,6 @@
         <script>
             const HEADER = `<HAScript name="GENERATED_MACRO" description="" timeout="60000" pausetime="300" promptall="true" blockinput="true" author="" creationdate="" supressclearevents="false" usevars="false" ignorepauseforenhancedtn="true" delayifnotenhancedtn="0" ignorepausetimeforenhancedtn="true" continueontimeout="false">`;
             const FOOTER = `\n</HAScript>`;
-            const CLEAR_FIELD =
-                "[delete][delete][delete][delete][delete][delete][delete][delete][delete][delete]";
 
             document.addEventListener("DOMContentLoaded", () => {
                 addHomeRow();
@@ -295,12 +293,12 @@
                 const tbody = document.getElementById("homeBody");
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
-                    <td><input type="text" placeholder="e.g. 1811215" class="sku-input"></td>
-                    <td><input type="text" placeholder="e.g. FX02A001" class="slot-input"></td>
-                    <td><input type="number" placeholder="e.g. 6" class="max-input"></td>
-                    <td><input type="number" placeholder="e.g. 3" class="min-input"></td>
-                    <td><button class="btn-del" onclick="removeRow(this)">X</button></td>
-                `;
+            <td><input type="text" placeholder="e.g. 1811215" class="sku-input"></td>
+            <td><input type="text" placeholder="e.g. FX02A001" class="slot-input"></td>
+            <td><input type="number" placeholder="e.g. 6" class="max-input"></td>
+            <td><input type="number" placeholder="e.g. 3" class="min-input"></td>
+            <td><button class="btn-del" onclick="removeRow(this)">X</button></td>
+        `;
                 tbody.appendChild(tr);
             }
 
@@ -308,12 +306,12 @@
                 const tbody = document.getElementById("moveBody");
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
-                    <td><input type="text" value="${sku}" placeholder="e.g. 3791994" class="sku-input"></td>
-                    <td><input type="text" value="${from}" placeholder="e.g. GF02B000" class="from-slot-input"></td>
-                    <td><input type="text" value="${to}" placeholder="e.g. CMDA0100" class="to-slot-input"></td>
-                    <td><input type="number" value="${qty}" placeholder="e.g. 2" class="qty-input"></td>
-                    <td><button class="btn-del" onclick="removeRow(this)">X</button></td>
-                `;
+            <td><input type="text" value="${sku}" placeholder="e.g. 3791994" class="sku-input"></td>
+            <td><input type="text" value="${from}" placeholder="e.g. GF02B000" class="from-slot-input"></td>
+            <td><input type="text" value="${to}" placeholder="e.g. CMDA0100" class="to-slot-input"></td>
+            <td><input type="number" value="${qty}" placeholder="e.g. 2" class="qty-input"></td>
+            <td><button class="btn-del" onclick="removeRow(this)">X</button></td>
+        `;
                 tbody.appendChild(tr);
                 return tr;
             }
@@ -355,142 +353,12 @@
                 }
             }
 
-            function getBackOutScreens(counter) {
-                return `
-                    <screen name="Screen${counter}" entryscreen="false" exitscreen="false" transient="false">
-                        <description><oia status="NOTINHIBITED" optional="false" invertmatch="false" /></description>
-                        <actions><input value="[pf1]" row="0" col="0" movecursor="true" xlatehostkeys="true" encrypted="false" /></actions>
-                        <nextscreens timeout="0"><nextscreen name="Screen${counter + 1}" /></nextscreens>
-                    </screen>
-                    <screen name="Screen${counter + 1}" entryscreen="false" exitscreen="true" transient="false">
-                        <description><oia status="NOTINHIBITED" optional="false" invertmatch="false" /></description>
-                        <actions><input value="[pf1]" row="0" col="0" movecursor="true" xlatehostkeys="true" encrypted="false" /></actions>
-                        <nextscreens timeout="0"></nextscreens>
-                    </screen>`;
-            }
-
+            // Note: Placeholders for your existing macro generation logic
             function generateHomeMacro() {
-                const rows = document.querySelectorAll("#homeBody tr");
-                const errorMsg = document.getElementById("homeError");
-                let macroContent = HEADER.replace(
-                    "GENERATED_MACRO",
-                    "UPDATE_HOME",
-                );
-                let isValid = true;
-
-                macroContent += `
-                    <screen name="Screen1" entryscreen="true" exitscreen="false" transient="false">
-                        <description><oia status="NOTINHIBITED" optional="false" invertmatch="false" /></description>
-                        <actions><input value="11[pf2]" row="0" col="0" movecursor="true" xlatehostkeys="true" encrypted="false" /></actions>
-                        <nextscreens timeout="0"><nextscreen name="Screen2" /></nextscreens>
-                    </screen>`;
-
-                let screenCounter = 2;
-                rows.forEach((row) => {
-                    const sku = row.querySelector(".sku-input").value.trim();
-                    const slot = row.querySelector(".slot-input").value.trim();
-                    const max = row.querySelector(".max-input").value.trim();
-                    const min = row.querySelector(".min-input").value.trim();
-
-                    if (!sku || !slot || !max || !min) {
-                        isValid = false;
-                        return;
-                    }
-
-                    macroContent += `
-                        <screen name="Screen${screenCounter}" entryscreen="false" exitscreen="false" transient="false">
-                            <description><oia status="NOTINHIBITED" optional="false" invertmatch="false" /></description>
-                            <actions><input value="${slot}${sku}[enter]" row="0" col="0" movecursor="true" xlatehostkeys="true" encrypted="false" /></actions>
-                            <nextscreens timeout="0"><nextscreen name="Screen${screenCounter + 1}" /></nextscreens>
-                        </screen>`;
-                    screenCounter++;
-
-                    macroContent += `
-                        <screen name="Screen${screenCounter}" entryscreen="false" exitscreen="false" transient="false">
-                            <description><oia status="NOTINHIBITED" optional="false" invertmatch="false" /></description>
-                            <actions><input value="[tab]${CLEAR_FIELD}${max}[tab]${CLEAR_FIELD}${min}[tab]y[pf7]" row="0" col="0" movecursor="true" xlatehostkeys="true" encrypted="false" /></actions>
-                            <nextscreens timeout="0"><nextscreen name="Screen${screenCounter + 1}" /></nextscreens>
-                        </screen>`;
-                    screenCounter++;
-                });
-
-                if (!isValid) {
-                    errorMsg.style.display = "inline";
-                    return;
-                }
-                errorMsg.style.display = "none";
-                macroContent += getBackOutScreens(screenCounter);
-                macroContent += FOOTER;
-                downloadFile("update_home.mac", macroContent);
+                alert("Logic to generate Home Macro goes here.");
             }
-
             function generateMoveMacro() {
-                const rows = document.querySelectorAll("#moveBody tr");
-                const errorMsg = document.getElementById("moveError");
-                let macroContent = HEADER.replace(
-                    "GENERATED_MACRO",
-                    "MOVE_SKU",
-                );
-                let isValid = true;
-
-                macroContent += `
-                    <screen name="Screen1" entryscreen="true" exitscreen="false" transient="false">
-                        <description><oia status="NOTINHIBITED" optional="false" invertmatch="false" /></description>
-                        <actions><input value="31[pf2]" row="0" col="0" movecursor="true" xlatehostkeys="true" encrypted="false" /></actions>
-                        <nextscreens timeout="0"><nextscreen name="Screen2" /></nextscreens>
-                    </screen>`;
-
-                let screenCounter = 2;
-                rows.forEach((row) => {
-                    const sku = row.querySelector(".sku-input").value.trim();
-                    const fromSlot = row
-                        .querySelector(".from-slot-input")
-                        .value.trim();
-                    const toSlot = row
-                        .querySelector(".to-slot-input")
-                        .value.trim();
-                    const qty = row.querySelector(".qty-input").value.trim();
-
-                    if (!sku || !fromSlot || !toSlot || !qty) {
-                        isValid = false;
-                        return;
-                    }
-
-                    macroContent += `
-                        <screen name="Screen${screenCounter}" entryscreen="false" exitscreen="false" transient="false">
-                            <description><oia status="NOTINHIBITED" optional="false" invertmatch="false" /></description>
-                            <actions><input value="${fromSlot}${sku}[enter]" row="0" col="0" movecursor="true" xlatehostkeys="true" encrypted="false" /></actions>
-                            <nextscreens timeout="0"><nextscreen name="Screen${screenCounter + 1}" /></nextscreens>
-                        </screen>`;
-                    screenCounter++;
-
-                    macroContent += `
-                        <screen name="Screen${screenCounter}" entryscreen="false" exitscreen="false" transient="false">
-                            <description><oia status="NOTINHIBITED" optional="false" invertmatch="false" /></description>
-                            <actions><input value="${toSlot}${qty}[pf7]" row="0" col="0" movecursor="true" xlatehostkeys="true" encrypted="false" /></actions>
-                            <nextscreens timeout="0"><nextscreen name="Screen${screenCounter + 1}" /></nextscreens>
-                        </screen>`;
-                    screenCounter++;
-                });
-
-                if (!isValid) {
-                    errorMsg.style.display = "inline";
-                    return;
-                }
-                errorMsg.style.display = "none";
-                macroContent += getBackOutScreens(screenCounter);
-                macroContent += FOOTER;
-                downloadFile("move_sku.mac", macroContent);
-            }
-
-            function downloadFile(filename, content) {
-                const blob = new window.Blob([content], { type: "text/plain" });
-                const link = document.createElement("a");
-                link.href = window.URL.createObjectURL(blob);
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                alert("Logic to generate Move Macro goes here.");
             }
         </script>
     </body>
