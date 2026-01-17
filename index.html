@@ -169,6 +169,44 @@
                     opacity: 1;
                 }
             }
+
+            /* Toast styles */
+            .toast-container {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 1000;
+                pointer-events: none;
+            }
+            .toast {
+                background: #333;
+                color: white;
+                padding: 12px 16px;
+                border-radius: 4px;
+                margin-bottom: 10px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+                font-size: 14px;
+                max-width: 300px;
+                word-wrap: break-word;
+                opacity: 0;
+                transform: translateX(100%);
+                transition: all 0.3s ease;
+                pointer-events: auto;
+            }
+            .toast.show {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            .toast.success {
+                background: #28a745;
+            }
+            .toast.error {
+                background: #dc3545;
+            }
+            .toast.warning {
+                background: #ffc107;
+                color: #212529;
+            }
         </style>
     </head>
     <body>
@@ -324,8 +362,9 @@
                     const parts = text.split(",").map((part) => part.trim());
 
                     if (parts.length !== 4) {
-                        alert(
+                        showToast(
                             "Clipboard does not match format: SKU,FromSlot,ToSlot,Quantity",
+                            "error",
                         );
                         return;
                     }
@@ -348,9 +387,11 @@
                     } else {
                         addMoveRow(sku, from, to, qty);
                     }
+                    showToast("Data pasted successfully!", "success");
                 } catch (err) {
-                    alert(
+                    showToast(
                         "Failed to read clipboard. Please ensure you have given permission.",
+                        "error",
                     );
                 }
             }
@@ -422,6 +463,7 @@
                 macroContent += getBackOutScreens(screenCounter);
                 macroContent += FOOTER;
                 downloadFile("update_home.mac", macroContent);
+                showToast("Home macro generated successfully!", "success");
             }
 
             function generateMoveMacro() {
@@ -481,6 +523,7 @@
                 macroContent += getBackOutScreens(screenCounter);
                 macroContent += FOOTER;
                 downloadFile("move_sku.mac", macroContent);
+                showToast("Move SKU macro generated successfully!", "success");
             }
 
             function downloadFile(filename, content) {
@@ -492,6 +535,27 @@
                 link.click();
                 document.body.removeChild(link);
             }
+
+            // Toast notification function
+            function showToast(message, type = "info") {
+                const container = document.getElementById("toastContainer");
+                const toast = document.createElement("div");
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                container.appendChild(toast);
+
+                // Trigger animation
+                setTimeout(() => toast.classList.add("show"), 10);
+
+                // Auto remove after 3 seconds
+                setTimeout(() => {
+                    toast.classList.remove("show");
+                    setTimeout(() => container.removeChild(toast), 300);
+                }, 3000);
+            }
         </script>
+
+        <!-- Toast container -->
+        <div class="toast-container" id="toastContainer"></div>
     </body>
 </html>
