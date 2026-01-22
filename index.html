@@ -359,40 +359,42 @@
             async function pasteMoveData() {
                 try {
                     const text = await navigator.clipboard.readText();
-                    const parts = text.split(",").map((part) => part.trim());
-
-                    if (parts.length !== 4) {
-                        showToast(
-                            "Clipboard does not match format: SKU,FromSlot,ToSlot,Quantity",
-                            "error",
-                        );
-                        return;
+                    // Split by line breaks and remove empty lines
+                    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+                    
+                    let processedCount = 0;
+                
+                    for (const line of lines) {
+                        const parts = line.split(",").map((part) => part.trim());
+                
+                        if (parts.length !== 4) continue; // Skip lines that don't match the format
+                
+                        const [sku, from, to, qty] = parts;
+                        const tbody = document.getElementById("moveBody");
+                        const lastRow = tbody.lastElementChild;
+                        
+                        // Check if last row exists and is empty to reuse it
+                        const inputs = lastRow ? lastRow.querySelectorAll("input") : [];
+                        const isEmpty = inputs.length > 0 && Array.from(inputs).every(i => i.value === "");
+                
+                        if (isEmpty) {
+                            inputs[0].value = sku;
+                            inputs[1].value = from;
+                            inputs[2].value = to;
+                            inputs[3].value = qty;
+                        } else {
+                            addMoveRow(sku, from, to, qty);
+                        }
+                        processedCount++;
                     }
-
-                    const [sku, from, to, qty] = parts;
-                    const tbody = document.getElementById("moveBody");
-                    const lastRow = tbody.lastElementChild;
-                    const inputs = lastRow.querySelectorAll("input");
-
-                    // Check if last row is empty to reuse it, otherwise add new
-                    const isEmpty = Array.from(inputs).every(
-                        (i) => i.value === "",
-                    );
-
-                    if (isEmpty) {
-                        inputs[0].value = sku;
-                        inputs[1].value = from;
-                        inputs[2].value = to;
-                        inputs[3].value = qty;
+                
+                    if (processedCount > 0) {
+                        showToast(`Successfully pasted ${processedCount} move(s).`, "success");
                     } else {
-                        addMoveRow(sku, from, to, qty);
+                        showToast("Clipboard format invalid. Expected: SKU,FromSlot,ToSlot,Quantity", "error");
                     }
-                    showToast("Data pasted successfully!", "success");
                 } catch (err) {
-                    showToast(
-                        "Failed to read clipboard. Please ensure you have given permission.",
-                        "error",
-                    );
+                    showToast("Failed to read clipboard. Please ensure you have given permission.", "error");
                 }
             }
 
